@@ -112,7 +112,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
     _dotTransitionAnimation =
         Tween(begin: widget.style.dotActiveScale, end: 0.0).animate(
       CurvedAnimation(
-        curve: Curves.linear,
+        curve: Curves.easeInOut,
         parent: _dotTransitionController,
       ),
     )..addListener(() => setState(() {}));
