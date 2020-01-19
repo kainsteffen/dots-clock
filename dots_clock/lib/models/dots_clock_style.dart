@@ -1,3 +1,7 @@
+// Copyright 2019 Tran Duy Khanh Steffen. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the dots_clock/LICENSE file.
+
 import 'dart:math';
 
 import 'package:fast_noise/fast_noise.dart';
