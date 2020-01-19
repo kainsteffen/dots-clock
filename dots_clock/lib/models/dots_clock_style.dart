@@ -10,6 +10,10 @@ class DotsClockStyle {
     @required this.fontPath,
     @required this.charXPosCorrections,
     @required this.gridBuilder,
+    this.brightColor: Colors.black,
+    this.darkColor: Colors.white,
+    this.brightBackgroundColor: Colors.white,
+    this.darkBackgroundColor: Colors.black,
     this.idleAnimationDuration: 10000,
     this.transitionAnimationDuration: 1000,
     this.fontSize: 0.4,
@@ -23,6 +27,12 @@ class DotsClockStyle {
         assert(dotActiveScale != null),
         assert(fontPath != null),
         assert(charXPosCorrections != null),
+        assert(gridBuilder != null),
+        assert(brightColor != null),
+        assert(darkColor != null),
+        assert(brightBackgroundColor != null),
+        assert(darkBackgroundColor != null),
+        assert(charXPosCorrections != null),
         assert(idleAnimationDuration != null),
         assert(transitionAnimationDuration != null),
         assert(dotSpacing != null),
@@ -35,6 +45,26 @@ class DotsClockStyle {
         assert(shouldCenterHorizontally != null),
         assert(idleAnimationDuration > 0),
         assert(transitionAnimationDuration > 0);
+
+  /// Main color that constrasts with [brightBackgroundColor]
+  ///
+  /// Used for bright theme setting
+  final Color brightColor;
+
+  /// Main color that constrasts with [darkBackgroundColor]
+  ///
+  /// Used for dark theme setting
+  final Color darkColor;
+
+  /// Background color that constrasts with [brightColor]
+  ///
+  /// Used for bright theme setting.
+  final Color brightBackgroundColor;
+
+  /// Background color that constrasts with [darkColor]
+  ///
+  /// Used for dark theme setting.
+  final Color darkBackgroundColor;
 
   /// Duration of 1 cycle of the dots' idle animations.
   final int idleAnimationDuration;
@@ -85,6 +115,10 @@ class DotsClockStyle {
 
   /// Overrides existing [DotsClockStyle] with defined values.
   DotsClockStyle copyWith({
+    Color brightColor,
+    Color darkColor,
+    Color brightBackgroundColor,
+    Color darkBackgroundColor,
     int idleAnimationDuration,
     int transitionAnimationDuration,
     double dotSpacing,
@@ -101,6 +135,11 @@ class DotsClockStyle {
     Function(int rows, int columns) gridBuilder,
   }) {
     return DotsClockStyle(
+      brightColor: brightColor ?? this.brightColor,
+      darkColor: darkColor ?? this.darkColor,
+      brightBackgroundColor:
+          brightBackgroundColor ?? this.brightBackgroundColor,
+      darkBackgroundColor: darkBackgroundColor ?? this.darkBackgroundColor,
       idleAnimationDuration:
           idleAnimationDuration ?? this.idleAnimationDuration,
       transitionAnimationDuration:

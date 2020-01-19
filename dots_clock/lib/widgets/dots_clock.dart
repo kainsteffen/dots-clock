@@ -287,18 +287,26 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRect(
-      child: CustomPaint(
-        painter: DotsPainter(
-          oldPath: _oldPath,
-          currentPath: _currentPath,
-          pulseValue: _dotPulseAnimation.value,
-          grid: _dotsGrid,
-          rows: _rows,
-          columns: _columns,
-          transitionValue: _dotTransitionAnimation.value,
-          spacing: widget.style.dotSpacing,
-          activeScale: widget.style.dotActiveScale,
+    return Container(
+      color: Theme.of(context).brightness == Brightness.light
+          ? widget.style.brightBackgroundColor
+          : widget.style.darkBackgroundColor,
+      child: ClipRect(
+        child: CustomPaint(
+          painter: DotsPainter(
+            color: Theme.of(context).brightness == Brightness.light
+                ? widget.style.brightColor
+                : widget.style.darkColor,
+            oldPath: _oldPath,
+            currentPath: _currentPath,
+            pulseValue: _dotPulseAnimation.value,
+            grid: _dotsGrid,
+            rows: _rows,
+            columns: _columns,
+            transitionValue: _dotTransitionAnimation.value,
+            spacing: widget.style.dotSpacing,
+            activeScale: widget.style.dotActiveScale,
+          ),
         ),
       ),
     );
@@ -310,6 +318,7 @@ class DotsPainter extends CustomPainter {
   DotsPainter({
     this.oldPath,
     this.currentPath,
+    @required this.color,
     @required this.grid,
     @required this.rows,
     @required this.columns,
@@ -330,6 +339,9 @@ class DotsPainter extends CustomPainter {
   /// Used to compare differences between clock ticks and
   /// animate transitions for the dots.
   final Path currentPath;
+
+  /// [Color] with which ti draw the dots.
+  final Color color;
 
   /// 2d array containing the initial size values for each dot.
   final List<List<double>> grid;
@@ -392,7 +404,7 @@ class DotsPainter extends CustomPainter {
 
         canvas.drawOval(
           Rect.fromCircle(center: offset, radius: radius),
-          Paint(),
+          Paint()..color = color,
         );
       }
     }

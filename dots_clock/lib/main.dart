@@ -54,6 +54,8 @@ void main() {
               // sizing on all displays since aspect ratio is always the same.
               dotSpacing: constraints.maxHeight * 0.017,
               dotActiveScale: constraints.maxHeight * 0.008,
+              brightBackgroundColor: Color(0xFFF4F4F4),
+              darkBackgroundColor: Color(0xFF10151B),
             ),
           ),
         ),
