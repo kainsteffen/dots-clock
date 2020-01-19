@@ -85,6 +85,8 @@ class DotsClockStyle {
 
   /// Overrides existing [DotsClockStyle] with defined values.
   DotsClockStyle copyWith({
+    int idleAnimationDuration,
+    int transitionAnimationDuration,
     double dotSpacing,
     double dotActiveScale,
     String fontPath,
@@ -99,6 +101,10 @@ class DotsClockStyle {
     Function(int rows, int columns) gridBuilder,
   }) {
     return DotsClockStyle(
+      idleAnimationDuration:
+          idleAnimationDuration ?? this.idleAnimationDuration,
+      transitionAnimationDuration:
+          transitionAnimationDuration ?? this.transitionAnimationDuration,
       dotSpacing: dotSpacing ?? this.dotSpacing,
       dotActiveScale: dotActiveScale ?? this.dotActiveScale,
       fontPath: fontPath ?? this.fontPath,
