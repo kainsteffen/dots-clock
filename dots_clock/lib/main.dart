@@ -4,11 +4,12 @@
 
 import 'dart:io';
 
+import 'package:dots_clock/models/dots_clock_style.dart';
 import 'package:dots_clock/widgets/dots_clock.dart';
-import 'package:flutter_clock_helper/customizer.dart';
-import 'package:flutter_clock_helper/model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_clock_helper/customizer.dart';
+import 'package:flutter_clock_helper/model.dart';
 
 void main() {
   // A temporary measure until Platform supports web and TargetPlatform supports
@@ -29,5 +30,34 @@ void main() {
   //
   // Your job is to edit [DigitalClock], or replace it with your
   // own clock widget. (Look in digital_clock.dart for more details!)
-  runApp(ClockCustomizer((ClockModel model) => DotsClock(model)));
+  runApp(
+    ClockCustomizer(
+      (ClockModel model) => Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: LayoutBuilder(
+          builder: (context, constraints) => DotsClock(
+            width: constraints.maxWidth,
+            height: constraints.maxHeight,
+            model: model,
+            // For other clocks, replace DotsClockStyle with the
+            // following ones or make your own clock and reload.
+            //
+            // DotsClockStyle.blobs(),
+            // DotsClockStyle.cellularNoise(),
+            // DotsClockStyle.cubicNoise(),
+            // DotsClockStyle.gooey(),
+            // DotsClockStyle.simplexNoise(),
+            // DotsClockStyle.valueNoise(),
+            // DotsClockStyle.whiteNoise()
+            style: DotsClockStyle.standard().copyWith(
+              // Use box constraint height dependant units for consistent
+              // sizing on all displays since aspect ratio is always the same.
+              dotSpacing: constraints.maxHeight * 0.017,
+              dotActiveScale: constraints.maxHeight * 0.008,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }

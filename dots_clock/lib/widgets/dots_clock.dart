@@ -1,145 +1,124 @@
-import 'package:fast_noise/fast_noise.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'dart:async';
 import 'dart:math';
-import 'package:intl/intl.dart';
 
+import 'package:dots_clock/models/dots_clock_style.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_clock_helper/model.dart';
+import 'package:intl/intl.dart';
 import 'package:text_to_path_maker/text_to_path_maker.dart';
 
-final PerlinNoise perlinNoise = PerlinNoise(
-  octaves: 4,
-  frequency: 0.35,
-);
-
-// Correcting the x-position of certain characters since the font is not monospaced
-final Map<String, double> charPathOffset = <String, double>{
-  "1": 150.0,
-  "7": 70.0,
-};
-
 class DotsClock extends StatefulWidget {
-  final ClockModel model;
-  final double dotSpacing;
-  final double dotActiveScale;
-
-  const DotsClock(
-    this.model, {
-    this.dotSpacing: 6.5,
-    this.dotActiveScale: 3,
+  const DotsClock({
+    @required this.model,
+    @required this.style,
+    @required this.width,
+    @required this.height,
   });
+
+  /// [ClockModel] to provide weather, temperature, location information.
+  final ClockModel model;
+
+  /// Data model that has the style specifications.
+  final DotsClockStyle style;
+
+  /// Width of the available render space.
+  final double width;
+
+  /// Height of the available render space.
+  final double height;
 
   @override
   State<StatefulWidget> createState() => DotsClockState();
 }
 
 class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
+  /// Current time.
   DateTime _dateTime = DateTime.now();
-  Timer _timer;
-  List<List<double>> dotGrid;
-  int rows = 39;
-  int columns = 64;
 
+  /// Timer to update clock in an interval.
+  Timer _timer;
+
+  /// Font for the digital clock face.
   PMFont _targetFont;
 
+  /// Current path of the digital clock face.
+  ///
+  /// Used to compare differences between clock ticks and
+  /// animate transitions for the dots.
   Path _currentPath;
+
+  /// Previous path of the digital clock face.
+  ///
+  /// Used to compare differences between clock ticks and
+  /// animate transitions for the dots.
   Path _oldPath;
 
+  /// 2d array containing the initial size values for each dot.
+  List<List<double>> _dotsGrid;
+
+  /// Animation controller for the dot idle animations.
   AnimationController _dotPulseController;
+
+  /// Animation [Tween] values for the dot idle animations.
   Animation<double> _dotPulseAnimation;
 
+  /// Animation controller for the dot transitions animations.
   AnimationController _dotTransitionController;
+
+  /// Animation [Tween] values for the dot idle animations.
   Animation<double> _dotTransitionAnimation;
 
-  // DotsClockState({
-  //   @required this.rows,
-  //   @required this.columns,
-  //   @required this.dotSpacing,
-  //   @required this.dotActiveScale,
-  // });
+  /// Number of rows based on [DotsClockStyle] and it's dot spacing.
+  int _rows;
+
+  /// Number of columns based on [DotsClockStyle] and it's dot spacing.
+  int _columns;
 
   @override
   void initState() {
     super.initState();
+    // Calculate number of columns, rows based on dot spacing
+    _rows = (widget.height / widget.style.dotSpacing).floor();
+    _columns = (widget.width / widget.style.dotSpacing).floor();
+
+    // Dot idle pulsing animation that scales the dots'
+    // sizes via sine wave functions.
     _dotPulseController = AnimationController(
-        duration: Duration(milliseconds: 10000), vsync: this);
+      duration: Duration(
+        milliseconds: widget.style.idleAnimationDuration,
+      ),
+      vsync: this,
+    );
     _dotPulseAnimation = Tween(begin: 0.0, end: 2 * pi).animate(
       CurvedAnimation(
         curve: Curves.linear,
         parent: _dotPulseController,
       ),
     )..addListener(() => setState(() {}));
-
     _dotPulseController.repeat();
 
+    // Dot transition animation between active/inactive state
+    // by scaling them up or down to their correct size.
     _dotTransitionController = AnimationController(
-        duration: Duration(milliseconds: 1000), vsync: this);
+      duration:
+          Duration(milliseconds: widget.style.transitionAnimationDuration),
+      vsync: this,
+    );
     _dotTransitionAnimation =
-        Tween(begin: widget.dotActiveScale, end: 0.0).animate(
+        Tween(begin: widget.style.dotActiveScale, end: 0.0).animate(
       CurvedAnimation(
         curve: Curves.linear,
         parent: _dotTransitionController,
       ),
     )..addListener(() => setState(() {}));
+
     widget.model.addListener(_updateModel);
+
     _loadFont();
     _initDotsGrid();
     _updateTime();
     _updateModel();
-  }
-
-  @override
-  void didChangeDependencies() {
-    rows = (MediaQuery.of(context).size.height / widget.dotSpacing).floor();
-    columns = (MediaQuery.of(context).size.width / widget.dotSpacing).floor();
-    _initDotsGrid();
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    _dotPulseController.dispose();
-    _dotTransitionController.dispose();
-    super.dispose();
-  }
-
-  void _loadFont() async {
-    ByteData data = await rootBundle.load("assets/fonts/Poppins-Bold.ttf");
-    PMFontReader reader = PMFontReader();
-    _targetFont = reader.parseTTFAsset(data);
-  }
-
-  void _updatePath(String time) {
-    _oldPath = _currentPath;
-    if (_targetFont != null) {
-      _currentPath = _buildClockFacePath(time);
-    }
-  }
-
-  Path _buildClockFacePath(String string) {
-    Path stringPath = Path();
-
-    for (int i = 0; i < string.length; i++) {
-      Path charPath =
-          _targetFont.generatePathForCharacter(string.codeUnitAt(i));
-
-      // y-scale needs to be -1 because the method scales by minus y-scale
-      charPath = charPathOffset.containsKey(string[i])
-          ? PMTransform.moveAndScale(
-              charPath, charPathOffset[string[i]], 0.0, 1.0, -1.0)
-          : charPath;
-
-      stringPath.addPath(
-        PMTransform.moveAndScale(charPath, i * 100.0 + 20, 220.0, 0.225, 0.225),
-        Offset(
-          i * 50.0,
-          50,
-        ),
-      );
-    }
-    return stringPath;
   }
 
   @override
@@ -151,91 +130,180 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
     }
   }
 
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _dotPulseController.dispose();
+    _dotTransitionController.dispose();
+    super.dispose();
+  }
+
+  /// Update 3rd party information model
+  ///
+  /// Currently unused.
   void _updateModel() {
     setState(() {
       // Cause the clock to rebuild when the model changes.
     });
   }
 
+  /// Initialise dots grid via [DotsClockStyle] builder function.
+  _initDotsGrid() {
+    _dotsGrid = widget.style.gridBuilder(_rows, _columns);
+  }
+
+  /// Update current [_time] in a given interval and update clock face path.
   void _updateTime() {
     setState(() {
       _dateTime = DateTime.now();
       // Update once per minute. If you want to update every second, use the
       // following code.
-      // _timer = Timer(
-      //   Duration(minutes: 1) -
-      //       Duration(seconds: _dateTime.second) -
-      //       Duration(milliseconds: _dateTime.millisecond),
-      //   _updateTime,
-      // );
-      // Update once per second, but make sure to do it at the beginning of each
-      // new second, so that the clock is accurate.
       _timer = Timer(
-        Duration(seconds: 4) - Duration(milliseconds: _dateTime.millisecond),
+        Duration(minutes: 1) -
+            Duration(seconds: _dateTime.second) -
+            Duration(milliseconds: _dateTime.millisecond),
         _updateTime,
       );
-      final String hour = DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh')
-          .format(_dateTime);
-      final String minute = DateFormat('mm').format(_dateTime);
+      // Update once per second, but make sure to do it at the beginning of each
+      // new second, so that the clock is accurate.
+      // _timer = Timer(
+      //   Duration(seconds: 1) - Duration(milliseconds: _dateTime.millisecond),
+      //   _updateTime,
+      // );
 
-      _updatePath('$hour$minute');
+      _updatePath(_getFormattedTime());
     });
     _dotTransitionController.reset();
     _dotTransitionController.forward();
   }
 
-  _initDotsGrid() {
-    dotGrid = List.generate(
-      rows,
-      (int row) => List.generate(
-        columns,
-        (int column) {
-          double noise =
-              perlinNoise.getPerlin2(column.toDouble(), row.toDouble());
-          double percentage = (noise + sqrt1_2) / (2 * sqrt1_2);
-          double value = percentage * 2 * pi;
-          return value;
-        },
-      ),
-    );
+  /// Get the formatted time.
+  String _getFormattedTime() {
+    final String hour =
+        DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh').format(_dateTime);
+    final String minute = DateFormat('mm').format(_dateTime);
+    return '$hour$minute';
+  }
+
+  /// Load the target font.
+  Future<PMFont> _loadFont() async {
+    ByteData data = await rootBundle.load("assets/fonts/Poppins-Bold.ttf");
+    PMFontReader reader = PMFontReader();
+    _targetFont = reader.parseTTFAsset(data);
+    return reader.parseTTFAsset(data);
+  }
+
+  /// Update the clock face path.
+  void _updatePath(String time) {
+    _oldPath = _currentPath;
+    _currentPath = _buildClockFacePath(time);
+  }
+
+  /// Calculate the next clock face path.
+  Path _buildClockFacePath(String string) {
+    if (_targetFont != null) {
+      Path stringPath = Path();
+
+      for (int i = 0; i < string.length; i++) {
+        Path charPath =
+            _targetFont.generatePathForCharacter(string.codeUnitAt(i));
+
+        // PMTransform.moveAndScale scales by minus y-scale.
+        //
+        // Flip char path on y-axis.
+        charPath = PMTransform.moveAndScale(charPath, 0.0, 0.0, 1.0, 1.0);
+
+        // Scale char path to defined font size.
+        double targetHeight = widget.style.fontSize * widget.height;
+        double yScaleFactor = targetHeight / charPath.getBounds().height;
+        charPath = PMTransform.moveAndScale(
+            charPath, 0.0, 0.0, yScaleFactor, -yScaleFactor);
+
+        // Correct positions to make the font monospace.
+        //
+        // Some chars may overlap with other chars otherwise.
+        charPath = widget.style.charXPosCorrections.containsKey(string[i])
+            ? PMTransform.moveAndScale(
+                charPath,
+                widget.style.charXPosCorrections[string[i]] * targetHeight,
+                0.0,
+                1.0,
+                -1.0,
+              )
+            : charPath;
+
+        // Apply middle spacing based on char height.
+        charPath = i >= string.length / 2
+            ? PMTransform.moveAndScale(charPath,
+                widget.width * widget.style.middleSpacing, 0.0, 1.0, -1.0)
+            : charPath;
+
+        // Position chars.
+        charPath = PMTransform.moveAndScale(
+          charPath,
+          i * targetHeight * widget.style.fontSpacing +
+              (widget.style.xOffset * widget.width),
+          0.0,
+          1.0,
+          -1.0,
+        );
+
+        // Add chars to string path.
+        stringPath.addPath(
+          charPath,
+          Offset(
+            0,
+            0,
+          ),
+        );
+      }
+
+      // Center string path horizontally.
+      if (widget.style.shouldCenterHorizontally) {
+        final double targetXPos =
+            (widget.width / 2) - (stringPath.getBounds().width / 2);
+        final double xTranslation = targetXPos - stringPath.getBounds().left;
+        stringPath =
+            PMTransform.moveAndScale(stringPath, xTranslation, 0.0, 1.0, -1.0);
+      }
+
+      // Center string path vertically.
+      if (widget.style.shouldCenterVertically) {
+        final double targetYPos =
+            (widget.height / 2) - (stringPath.getBounds().height / 2);
+        final double yTranslation = targetYPos - stringPath.getBounds().top;
+        stringPath =
+            PMTransform.moveAndScale(stringPath, 0.0, yTranslation, 1.0, -1.0);
+      }
+
+      return stringPath;
+    } else {
+      return Path();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_targetFont != null) {
-      return LayoutBuilder(builder: (context, contraints) {
-        rows = (contraints.minHeight / widget.dotSpacing).floor();
-        columns = (contraints.minWidth / widget.dotSpacing).floor();
-        return CustomPaint(
-          painter: DotsPainter(
-              oldPath: _oldPath,
-              currentPath: _currentPath,
-              pulseValue: _dotPulseAnimation.value,
-              grid: dotGrid,
-              rows: rows,
-              columns: columns,
-              transitionValue: _dotTransitionAnimation.value,
-              spacing: widget.dotSpacing,
-              activeSizeScale: widget.dotActiveScale),
-        );
-      });
-    } else {
-      return CircularProgressIndicator();
-    }
+    return ClipRect(
+      child: CustomPaint(
+        painter: DotsPainter(
+          oldPath: _oldPath,
+          currentPath: _currentPath,
+          pulseValue: _dotPulseAnimation.value,
+          grid: _dotsGrid,
+          rows: _rows,
+          columns: _columns,
+          transitionValue: _dotTransitionAnimation.value,
+          spacing: widget.style.dotSpacing,
+          activeScale: widget.style.dotActiveScale,
+        ),
+      ),
+    );
   }
 }
 
+/// [CustomPainter] that draws the clock face for [DotsClock].
 class DotsPainter extends CustomPainter {
-  List<List<double>> grid;
-  Path oldPath;
-  Path currentPath;
-  double pulseValue;
-  double transitionValue;
-  double spacing;
-  double activeSizeScale;
-  int rows;
-  int columns;
-
   DotsPainter({
     this.oldPath,
     this.currentPath,
@@ -245,25 +313,66 @@ class DotsPainter extends CustomPainter {
     @required this.pulseValue,
     @required this.transitionValue,
     @required this.spacing,
-    @required this.activeSizeScale,
+    @required this.activeScale,
   });
+
+  /// Previous path of the digital clock face.
+  ///
+  /// Used to compare differences between clock ticks and
+  /// animate transitions for the dots.
+  final Path oldPath;
+
+  /// Current path of the digital clock face.
+  ///
+  /// Used to compare differences between clock ticks and
+  /// animate transitions for the dots.
+  final Path currentPath;
+
+  /// 2d array containing the initial size values for each dot.
+  final List<List<double>> grid;
+
+  /// Number of rows to paint.
+  final int rows;
+
+  /// Number of columns to paint.
+  final int columns;
+
+  /// Current idle animation value to add onto each dot's size.
+  final double pulseValue;
+
+  /// Current transition animation value to add onto some dot's size.
+  final double transitionValue;
+
+  /// Spacing between rows and columns of dots.
+  final double spacing;
+
+  /// Maximum scale of an active dot.
+  final double activeScale;
 
   @override
   void paint(Canvas canvas, Size size) {
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < columns; j++) {
-        Offset offset = Offset(j * spacing, i * spacing);
+        Offset offset = Offset(
+          j * spacing + (spacing / 2),
+          i * spacing + (spacing / 2),
+        );
+
+        // Calculate the dot's current size by adding idle animation value
+        // onto initial size and then applying sine function.
         double radius = sin(grid[i][j] + pulseValue);
 
+        // Paint dots differently based on their state:
+        // inactive -> active, active -> inactive, active, inactive.
         if (oldPath != null && currentPath != null) {
           // Dot scales down to base size
           if (oldPath.contains(offset) && !currentPath.contains(offset)) {
-            radius = radius * transitionValue.clamp(1, activeSizeScale);
+            radius = radius * transitionValue.clamp(1, activeScale);
           }
 
           // Dot scales up active size
           if (!oldPath.contains(offset) && currentPath.contains(offset)) {
-            radius = (radius * (activeSizeScale - transitionValue)).abs();
+            radius = (radius * (activeScale - transitionValue)).abs();
             //.clamp(1.0, 10.0);
           }
 
@@ -274,7 +383,7 @@ class DotsPainter extends CustomPainter {
 
           // Dot is at active size
           if (oldPath.contains(offset) && currentPath.contains(offset)) {
-            radius = (radius * activeSizeScale).abs(); //.clamp(1.0, 10.0);
+            radius = (radius * activeScale).abs(); //.clamp(1.0, 10.0);
           }
         }
 
@@ -287,7 +396,15 @@ class DotsPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(DotsPainter oldDelegate) {
+    return oldDelegate.oldPath != oldPath ||
+        oldDelegate.currentPath != currentPath ||
+        oldDelegate.grid != grid ||
+        oldDelegate.rows != rows ||
+        oldDelegate.columns != columns ||
+        oldDelegate.pulseValue != pulseValue ||
+        oldDelegate.transitionValue != transitionValue ||
+        oldDelegate.spacing != spacing ||
+        oldDelegate.activeScale != activeScale;
   }
 }
