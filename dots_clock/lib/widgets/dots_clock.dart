@@ -131,6 +131,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
       oldWidget.model.removeListener(_updateModel);
       widget.model.addListener(_updateModel);
     }
+    _updatePath(_getFormattedTime());
   }
 
   @override
