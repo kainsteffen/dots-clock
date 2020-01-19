@@ -32,31 +32,28 @@ void main() {
   // own clock widget. (Look in digital_clock.dart for more details!)
   runApp(
     ClockCustomizer(
-      (ClockModel model) => Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: LayoutBuilder(
-          builder: (context, constraints) => DotsClock(
-            width: constraints.maxWidth,
-            height: constraints.maxHeight,
-            model: model,
-            // For other clocks, replace DotsClockStyle with the
-            // following ones or make your own clock and reload.
-            //
-            // DotsClockStyle.blobs(),
-            // DotsClockStyle.cellularNoise(),
-            // DotsClockStyle.cubicNoise(),
-            // DotsClockStyle.gooey(),
-            // DotsClockStyle.simplexNoise(),
-            // DotsClockStyle.valueNoise(),
-            // DotsClockStyle.whiteNoise()
-            style: DotsClockStyle.standard().copyWith(
-              // Use box constraint height dependant units for consistent
-              // sizing on all displays since aspect ratio is always the same.
-              dotSpacing: constraints.maxHeight * 0.017,
-              dotActiveScale: constraints.maxHeight * 0.008,
-              brightBackgroundColor: Color(0xFFF4F4F4),
-              darkBackgroundColor: Color(0xFF10151B),
-            ),
+      (ClockModel model) => LayoutBuilder(
+        builder: (context, constraints) => DotsClock(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          model: model,
+          // For other clocks, replace DotsClockStyle with the
+          // following ones or make your own clock and reload.
+          //
+          // DotsClockStyle.blobs(),
+          // DotsClockStyle.cellularNoise(),
+          // DotsClockStyle.cubicNoise(),
+          // DotsClockStyle.gooey(),
+          // DotsClockStyle.simplexNoise(),
+          // DotsClockStyle.valueNoise(),
+          // DotsClockStyle.whiteNoise()
+          style: DotsClockStyle.standard().copyWith(
+            // Use box constraint height dependant units for consistent
+            // sizing on all displays since aspect ratio is always the same.
+            dotSpacing: constraints.maxHeight * 0.017,
+            dotActiveScale: constraints.maxHeight * 0.008,
+            brightBackgroundColor: Color(0xFFF4F4F4),
+            darkBackgroundColor: Color(0xFF10151B),
           ),
         ),
       ),
