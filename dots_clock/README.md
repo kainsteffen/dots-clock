@@ -1,4 +1,4 @@
-# dots_clock
+# Dots Clock
 
 A new Flutter project.
 
