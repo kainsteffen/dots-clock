@@ -40,37 +40,37 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
   /// Current time.
   DateTime _dateTime = DateTime.now();
 
-  /// Timer to update clock in an interval.
+  /// [Timer] to update clock in an interval.
   Timer _timer;
 
   /// Font for the digital clock face.
   PMFont _targetFont;
 
-  /// Current path of the digital clock face.
+  /// Current [Path] of the clock face's font.
   ///
-  /// Used to compare differences between clock ticks and
-  /// animate transitions for the dots.
+  /// Used to compare active/inactive dots differences between 
+  /// clock updates and animate transitions for the dots.
   Path _currentPath;
 
-  /// Previous path of the digital clock face.
+  /// Previous [Path] of the clock face's font.
   ///
   /// Used to compare differences between clock ticks and
   /// animate transitions for the dots.
   Path _oldPath;
 
-  /// 2d array containing the initial size values for each dot.
+  /// 2D array containing the initial size values for each dot.
   List<List<double>> _dotsGrid;
 
-  /// Animation controller for the dot idle animations.
+  /// [AnimationController] for the dot idle animations.
   AnimationController _dotPulseController;
 
-  /// Animation [Tween] values for the dot idle animations.
+  /// [Animation] values for the dot idle scaling animations.
   Animation<double> _dotPulseAnimation;
 
-  /// Animation controller for the dot transitions animations.
+  /// [AnimationController] for the dot transition animations.
   AnimationController _dotTransitionController;
 
-  /// Animation [Tween] values for the dot idle animations.
+  /// [Animation] values for the dot transition animations.
   Animation<double> _dotTransitionAnimation;
 
   /// Number of rows based on [DotsClockStyle] and it's dot spacing.
@@ -82,12 +82,13 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    // Calculate number of columns, rows based on dot spacing
+    // Calculate number of columns, rows based on dot spacing.
     _rows = (widget.height / widget.style.dotSpacing).floor();
     _columns = (widget.width / widget.style.dotSpacing).floor();
 
-    // Dot idle pulsing animation that scales the dots'
-    // sizes via sine wave functions.
+    // Dot idle pulsing animation that scales the dots' sizes.
+    //
+    // Is set to repeat as it should always be animating.
     _dotPulseController = AnimationController(
       duration: Duration(
         milliseconds: widget.style.idleAnimationDuration,
@@ -104,6 +105,8 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
 
     // Dot transition animation between active/inactive state
     // by scaling them up or down to their correct size.
+    //
+    // Plays for each clock update.
     _dotTransitionController = AnimationController(
       duration:
           Duration(milliseconds: widget.style.transitionAnimationDuration),
@@ -146,7 +149,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  /// Update 3rd party information model
+  /// Update 3rd party information model.
   ///
   /// Currently unused.
   void _updateModel() {
@@ -185,7 +188,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
     _dotTransitionController.forward();
   }
 
-  /// Get the formatted time.
+  /// Get the current formatted time.
   String _getFormattedTime() {
     final String hour =
         DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh').format(_dateTime);
@@ -218,7 +221,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
 
         // PMTransform.moveAndScale scales by minus y-scale.
         //
-        // Flip char path on y-axis.
+        // Flip char path on y-axis because inital paths are reversed.
         charPath = PMTransform.moveAndScale(charPath, 0.0, 0.0, 1.0, 1.0);
 
         // Scale char path to defined font size.
@@ -227,7 +230,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
         charPath = PMTransform.moveAndScale(
             charPath, 0.0, 0.0, yScaleFactor, -yScaleFactor);
 
-        // Correct positions to make the font monospace.
+        // Apply x-position corrections to make the font monospace.
         //
         // Some chars may overlap with other chars otherwise.
         charPath = widget.style.charXPosCorrections.containsKey(string[i])
@@ -246,7 +249,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
                 widget.width * widget.style.middleSpacing, 0.0, 1.0, -1.0)
             : charPath;
 
-        // Position chars.
+        // Position char path.
         charPath = PMTransform.moveAndScale(
           charPath,
           i * targetHeight * widget.style.fontSpacing +
@@ -256,7 +259,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
           -1.0,
         );
 
-        // Add chars to string path.
+        // Add char path to string path.
         stringPath.addPath(
           charPath,
           Offset(
@@ -333,22 +336,22 @@ class DotsPainter extends CustomPainter {
     @required this.activeScale,
   });
 
-  /// Previous path of the digital clock face.
+  /// Previous [Path] of the clock face's font.
   ///
-  /// Used to compare differences between clock ticks and
+  /// Used to compare differences between clock updates and
   /// animate transitions for the dots.
   final Path oldPath;
 
-  /// Current path of the digital clock face.
+  /// Current [Path] of the clock face's font.
   ///
-  /// Used to compare differences between clock ticks and
+  /// Used to compare differences between clock updates and
   /// animate transitions for the dots.
   final Path currentPath;
 
-  /// [Color] with which ti draw the dots.
+  /// [Color] with which to draw the dots.
   final Color color;
 
-  /// 2d array containing the initial size values for each dot.
+  /// 2D array containing the initial size values for each dot.
   final List<List<double>> grid;
 
   /// Number of rows to paint.
@@ -357,7 +360,7 @@ class DotsPainter extends CustomPainter {
   /// Number of columns to paint.
   final int columns;
 
-  /// Current idle animation value to add onto each dot's size.
+  /// Current idle scale animation value to add onto each dot's size.
   final double pulseValue;
 
   /// Current transition animation value to add onto some dot's size.
@@ -383,25 +386,24 @@ class DotsPainter extends CustomPainter {
         double radius = sin(grid[i][j] + pulseValue);
 
         // Paint dots differently based on their state:
-        // inactive -> active, active -> inactive, active, inactive.
         if (oldPath != null && currentPath != null) {
-          // Dot scales down to base size
+          // Dot is at inactive -> active state (transition scale down animation)
           if (oldPath.contains(offset) && !currentPath.contains(offset)) {
             radius = radius * transitionValue.clamp(1, activeScale);
           }
 
-          // Dot scales up active size
+          // Dot is at inactive -> active state (transition scale up animation)
           if (!oldPath.contains(offset) && currentPath.contains(offset)) {
             radius = (radius * (activeScale - transitionValue)).abs();
             //.clamp(1.0, 10.0);
           }
 
-          // Dot is at inactive size
+          // Dot is at inactive state (idle at base scale)
           if (!oldPath.contains(offset) && !currentPath.contains(offset)) {
             radius = radius;
           }
 
-          // Dot is at active size
+          // Dot is at active state (idle at activeScale)
           if (oldPath.contains(offset) && currentPath.contains(offset)) {
             radius = (radius * activeScale).abs(); //.clamp(1.0, 10.0);
           }
@@ -419,6 +421,7 @@ class DotsPainter extends CustomPainter {
   bool shouldRepaint(DotsPainter oldDelegate) {
     return oldDelegate.oldPath != oldPath ||
         oldDelegate.currentPath != currentPath ||
+        oldDelegate.color != color ||
         oldDelegate.grid != grid ||
         oldDelegate.rows != rows ||
         oldDelegate.columns != columns ||
