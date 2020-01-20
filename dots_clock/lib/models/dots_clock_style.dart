@@ -8,6 +8,10 @@ import 'package:fast_noise/fast_noise.dart';
 import 'package:flutter/material.dart';
 
 class DotsClockStyle {
+  /// Basic [DotsClockStyle] constructor.
+  ///
+  /// Some values need to have defaults or are required 
+  /// otherwise no clock can be displayed.
   const DotsClockStyle({
     @required this.dotSpacing,
     @required this.dotActiveScale,
@@ -50,26 +54,27 @@ class DotsClockStyle {
         assert(idleAnimationDuration > 0),
         assert(transitionAnimationDuration > 0);
 
-  /// Main color that constrasts with [brightBackgroundColor]
+  /// Main color that constrasts with [brightBackgroundColor].
   ///
-  /// Used for bright theme setting
+  /// Used for bright theme setting.
   final Color brightColor;
 
-  /// Main color that constrasts with [darkBackgroundColor]
+  /// Main color that constrasts with [darkBackgroundColor].
   ///
-  /// Used for dark theme setting
+  /// Used for dark theme setting.
   final Color darkColor;
 
-  /// Background color that constrasts with [brightColor]
+  /// Background color that constrasts with [brightColor].
   ///
   /// Used for bright theme setting.
   final Color brightBackgroundColor;
 
-  /// Background color that constrasts with [darkColor]
+  /// Background color that constrasts with [darkColor].
   ///
   /// Used for dark theme setting.
   final Color darkBackgroundColor;
 
+  // TODO: Refactor this to [Duration] type.
   /// Duration of 1 cycle of the dots' idle animations.
   final int idleAnimationDuration;
 
@@ -82,7 +87,7 @@ class DotsClockStyle {
   /// Scale of each dot when active.
   final double dotActiveScale;
 
-  /// Filepath for a font.
+  /// Filepath for the font to be masked on the dots grid.
   final String fontPath;
 
   /// Size of the font as a percentage of the window height.
@@ -91,30 +96,33 @@ class DotsClockStyle {
   /// Size of the font spacing as a percentage of font's height.
   final double fontSpacing;
 
-  /// Size of the middle spacing as a percentage of windows width.
+  /// Size of the middle spacing between hours/minutes as a percentage of the window's width.
   final double middleSpacing;
 
-  /// X-position to offset
+  /// X-position to offset the clock face [Path] with.
   ///
   /// Overwritten by [shouldCenterHorizontally] when true.
   final double xOffset;
 
-  /// Y-position to offset
+  /// Y-position to offset the clock face [Path] with.
   ///
   /// Overwritten by [shouldCenterVertically] when true.
   final double yOffset;
 
-  /// Centers the clock face path vertically when true.
+  /// Centers the clock face [Path] vertically when true.
   final bool shouldCenterVertically;
 
-  /// Centers the clock face path horitontally when true.
+  /// Centers the clock face [Path] horizontally when true.
   final bool shouldCenterHorizontally;
 
-  /// Corecctional values for the x-position of certain characters
-  /// for when the font is not monospaced.
+  /// Correctional values for the x-position of certain characters.
+  /// 
+  /// Fonts may not be monospaced after converting them to [Path].
+  /// Offsets the defined characters by a percentage of the font's 
+  /// height along the x-axis.
   final Map<String, double> charXPosCorrections;
 
-  /// Callback function to build initial 2d-array of dot sizes.
+  /// Callback function to build initial 2D array of dot initial sizes.
   final Function(int rows, int columns) gridBuilder;
 
   /// Overrides existing [DotsClockStyle] with defined values.
@@ -165,7 +173,7 @@ class DotsClockStyle {
     );
   }
 
-  /// A standard [DotsClockStyle]
+  /// A standard [DotsClockStyle].
   factory DotsClockStyle.standard() {
     return DotsClockStyle(
       dotSpacing: 6.5,
