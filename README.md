@@ -1,16 +1,16 @@
 # Dots Clock
 
-A new Flutter project.
+Dots Clock is a digital clock written in Flutter, Dart. It was developed for the [Flutter Clock challenge](https://flutter.dev/clock). 
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Clock Variations
 
-A few resources to get you started if this is your first Flutter project:
+| Variation | Screenshot | Motion Design |
+|Standard|![](images/dots_clock_standard.png)|![](images/1.jpeg|
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Design Philosophy
+
+## Goals
+
+The clock is meant to simulate a living, breathing entity that, while displaying time information, is also an interesting and soothing experience to look at. It should interest the viewer and spark just enough to still disappear into the background of your living space. I would describe this attribute of the clock its "lava lampdness".
