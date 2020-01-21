@@ -48,7 +48,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
 
   /// Current [Path] of the clock face's font.
   ///
-  /// Used to compare active/inactive dots differences between 
+  /// Used to compare active/inactive dots differences between
   /// clock updates and animate transitions for the dots.
   Path _currentPath;
 
@@ -198,7 +198,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
 
   /// Load the target font.
   Future<PMFont> _loadFont() async {
-    ByteData data = await rootBundle.load("assets/fonts/Poppins-Bold.ttf");
+    ByteData data = await rootBundle.load(widget.style.fontPath);
     PMFontReader reader = PMFontReader();
     _targetFont = reader.parseTTFAsset(data);
     return reader.parseTTFAsset(data);
