@@ -1,14 +1,29 @@
-![](images/standard.jpeg)
+![](images/standard.jpg)
 
 # Dots Clock
 
 Dots Clock is a digital clock written in Flutter, Dart. It was developed for the [Flutter Clock challenge](https://flutter.dev/clock). 
 
+# Table of Contents
+- [Clock Variations](#clock-variations)
+- [Design Philosophy](#design-philosophy)
+  * [Goals](#goals)
+  * [Implementation](#implementation)
+- [Final Thoughts](#final-thoughts)
 
-## Clock Variations
 
-| Variation | Screenshot | Motion Design |
-|Standard|![](images/standard.jpeg)|[Youtube](https://flutter.dev/clock). |
+# Clock Variations
+
+| Variation    | Screenshot                   | Motion Design                      |
+|--------------|------------------------------|------------------------------------|
+|Standard      |![](images/standard.jpg)      |[Youtube](https://flutter.dev/clock)|
+|Blobs         |![](images/blobs.jpg)         |[Youtube](https://flutter.dev/clock)|
+|Gooey         |![](images/gooey.jpg)         |[Youtube](https://flutter.dev/clock)|
+|Cellular Noise|![](images/cellular_noise.jpg)|[Youtube](https://flutter.dev/clock)|
+|Cubic Noise   |![](images/cubic_noise.jpg)   |[Youtube](https://flutter.dev/clock)|
+|Simplex Noise |![](images/simplex_noise.jpg) |[Youtube](https://flutter.dev/clock)|
+|Value Noise   |![](images/value_noise.jpg)   |[Youtube](https://flutter.dev/clock)|
+|White Noise   |![](images/white_noise.jpg)   |[Youtube](https://flutter.dev/clock)|
 
 
 # Design Philosophy
@@ -25,7 +40,7 @@ While it needs to be interesting to look at when in focus, it also needs to disa
 
 For the font that displays the time, Poppins is a natural choice with its **bold and easy to recognize silhouette**. Since the dot grid reduces the resolution and detail level of the font, it couldn't have been one with complex or thin shapes otherwise it would be drowned out by the dots' animations. The fonts is masked onto the grid and scales up the dots that are contained in it. The transitions between different clock face states is smoothed out with the dots slowly scaling up or down to their new state to make it like look a whole **group of dots is consciously shifting their focus to display the next numbers** on the clock.
 
-# Final thoughts
+# Final Thoughts
 
 Dots Clock is an exercise in **emergent motion design**. It was unknown to me how the final clock would look likte until it was actually built since the clock is modeled after realistic patterns and physics rules. The Perlin noise I employed is the same function that visual artists use to generate organic effects such as clouds, fire or landscape terrain. This connection to real-life helps it stand out as a force of nature rather than just a clock.
 
