@@ -6,7 +6,7 @@ Dots Clock is a digital clock written in Flutter, Dart. It was developed for the
 ## Clock Variations
 
 | Variation | Screenshot | Motion Design |
-|Standard|![](images/dots_clock_standard.png)|![](images/1.jpeg|
+|Standard|![](images/standard.jpeg)|[Youtube](https://flutter.dev/clock). |
 
 
 # Design Philosophy
