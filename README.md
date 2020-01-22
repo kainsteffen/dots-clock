@@ -1,3 +1,5 @@
+![](images/standard.jpeg)
+
 # Dots Clock
 
 Dots Clock is a digital clock written in Flutter, Dart. It was developed for the [Flutter Clock challenge](https://flutter.dev/clock). 
