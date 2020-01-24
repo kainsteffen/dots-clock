@@ -52,7 +52,7 @@ void main() {
             // on all displays since aspect ratio is always the same for the contest.
             dotSpacing: constraints.maxHeight * 0.017,
             dotBaseSize: 0.5,
-            dotActiveScale: constraints.maxHeight * 0.013, // 0.008, 0.01
+            dotActiveScale: constraints.maxHeight * 0.013,
             brightBackgroundColor: Color(0xFFF4F4F4),
             darkBackgroundColor: Color(0xFF10151B),
           ),
