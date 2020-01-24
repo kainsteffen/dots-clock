@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 class DotsClockStyle {
   /// Basic [DotsClockStyle] constructor.
   ///
-  /// Some values need to have defaults or are required 
+  /// Some values need to have defaults or are required
   /// otherwise no clock can be displayed.
   const DotsClockStyle({
     @required this.dotSpacing,
@@ -18,6 +18,7 @@ class DotsClockStyle {
     @required this.fontPath,
     @required this.charXPosCorrections,
     @required this.gridBuilder,
+    this.dotBaseSize: 1.0,
     this.brightColor: Colors.black,
     this.darkColor: Colors.white,
     this.brightBackgroundColor: Colors.white,
@@ -25,10 +26,10 @@ class DotsClockStyle {
     this.idleAnimationDuration: 10000,
     this.transitionAnimationDuration: 1000,
     this.fontSize: 0.4,
-    this.fontSpacing: 1,
-    this.middleSpacing: 0,
-    this.xOffset: 0,
-    this.yOffset: 0,
+    this.fontSpacing: 1.0,
+    this.middleSpacing: 0.0,
+    this.xOffset: 0.0,
+    this.yOffset: 0.0,
     this.shouldCenterVertically: true,
     this.shouldCenterHorizontally: false,
   })  : assert(dotSpacing != null),
@@ -36,6 +37,7 @@ class DotsClockStyle {
         assert(fontPath != null),
         assert(charXPosCorrections != null),
         assert(gridBuilder != null),
+        assert(dotBaseSize != null),
         assert(brightColor != null),
         assert(darkColor != null),
         assert(brightBackgroundColor != null),
@@ -82,9 +84,15 @@ class DotsClockStyle {
   final int transitionAnimationDuration;
 
   /// Space between each dot.
+  ///
+  /// The higher this value the more space there is between dots
+  /// and less dots will be displayed.
   final double dotSpacing;
 
-  /// Scale of each dot when active.
+  /// Size of dots at the sine wave's peak value.
+  final double dotBaseSize;
+
+  /// Maximum scale multiplier of an active dot.
   final double dotActiveScale;
 
   /// Filepath for the font to be masked on the dots grid.
@@ -116,9 +124,9 @@ class DotsClockStyle {
   final bool shouldCenterHorizontally;
 
   /// Correctional values for the x-position of certain characters.
-  /// 
+  ///
   /// Fonts may not be monospaced after converting them to [Path].
-  /// Offsets the defined characters by a percentage of the font's 
+  /// Offsets the defined characters by a percentage of the font's
   /// height along the x-axis.
   final Map<String, double> charXPosCorrections;
 
@@ -134,6 +142,7 @@ class DotsClockStyle {
     int idleAnimationDuration,
     int transitionAnimationDuration,
     double dotSpacing,
+    double dotBaseSize,
     double dotActiveScale,
     String fontPath,
     double fontSize,
@@ -157,6 +166,7 @@ class DotsClockStyle {
       transitionAnimationDuration:
           transitionAnimationDuration ?? this.transitionAnimationDuration,
       dotSpacing: dotSpacing ?? this.dotSpacing,
+      dotBaseSize: dotBaseSize ?? this.dotBaseSize,
       dotActiveScale: dotActiveScale ?? this.dotActiveScale,
       fontPath: fontPath ?? this.fontPath,
       gridBuilder: gridBuilder ?? this.gridBuilder,

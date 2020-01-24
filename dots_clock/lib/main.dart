@@ -48,10 +48,11 @@ void main() {
           // DotsClockStyle.valueNoise(),
           // DotsClockStyle.whiteNoise()
           style: DotsClockStyle.standard().copyWith(
-            // Use box constraint height dependant units for consistent
-            // sizing on all displays since aspect ratio is always the same.
+            // Use box constraint height dependant units for consistent sizing
+            // on all displays since aspect ratio is always the same for the contest.
             dotSpacing: constraints.maxHeight * 0.017,
-            dotActiveScale: constraints.maxHeight * 0.008,
+            dotBaseSize: 0.5,
+            dotActiveScale: constraints.maxHeight * 0.013, // 0.008, 0.01
             brightBackgroundColor: Color(0xFFF4F4F4),
             darkBackgroundColor: Color(0xFF10151B),
           ),

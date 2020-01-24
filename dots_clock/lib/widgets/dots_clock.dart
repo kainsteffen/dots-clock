@@ -313,7 +313,8 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
             columns: _columns,
             transitionValue: _dotTransitionAnimation.value,
             spacing: widget.style.dotSpacing,
-            activeScale: widget.style.dotActiveScale,
+            dotBaseSize: widget.style.dotBaseSize,
+            dotActiveScale: widget.style.dotActiveScale,
           ),
         ),
       ),
@@ -333,7 +334,8 @@ class DotsPainter extends CustomPainter {
     @required this.pulseValue,
     @required this.transitionValue,
     @required this.spacing,
-    @required this.activeScale,
+    @required this.dotBaseSize,
+    @required this.dotActiveScale,
   });
 
   /// Previous [Path] of the clock face's font.
@@ -367,10 +369,16 @@ class DotsPainter extends CustomPainter {
   final double transitionValue;
 
   /// Spacing between rows and columns of dots.
+  ///
+  /// The higher this value the more space there is between dots
+  /// and less dots will be displayed.
   final double spacing;
 
-  /// Maximum scale of an active dot.
-  final double activeScale;
+  /// Size of dots at the sine wave's peak value.
+  final double dotBaseSize;
+
+  /// Maximum scale multiplier of an active dot.
+  final double dotActiveScale;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -383,19 +391,18 @@ class DotsPainter extends CustomPainter {
 
         // Calculate the dot's current size by adding idle animation value
         // onto initial size and then applying sine function.
-        double radius = sin(grid[i][j] + pulseValue);
+        double radius = sin(grid[i][j] + pulseValue) * dotBaseSize;
 
         // Paint dots differently based on their state:
         if (oldPath != null && currentPath != null) {
           // Dot is at inactive -> active state (transition scale down animation)
           if (oldPath.contains(offset) && !currentPath.contains(offset)) {
-            radius = radius * transitionValue.clamp(1, activeScale);
+            radius = radius * transitionValue.clamp(1, dotActiveScale);
           }
 
           // Dot is at inactive -> active state (transition scale up animation)
           if (!oldPath.contains(offset) && currentPath.contains(offset)) {
-            radius = (radius * (activeScale - transitionValue)).abs();
-            //.clamp(1.0, 10.0);
+            radius = (radius * (dotActiveScale - transitionValue)).abs();
           }
 
           // Dot is at inactive state (idle at base scale)
@@ -405,7 +412,7 @@ class DotsPainter extends CustomPainter {
 
           // Dot is at active state (idle at activeScale)
           if (oldPath.contains(offset) && currentPath.contains(offset)) {
-            radius = (radius * activeScale).abs(); //.clamp(1.0, 10.0);
+            radius = (radius * dotActiveScale).abs();
           }
         }
 
@@ -428,6 +435,6 @@ class DotsPainter extends CustomPainter {
         oldDelegate.pulseValue != pulseValue ||
         oldDelegate.transitionValue != transitionValue ||
         oldDelegate.spacing != spacing ||
-        oldDelegate.activeScale != activeScale;
+        oldDelegate.dotActiveScale != dotActiveScale;
   }
 }
