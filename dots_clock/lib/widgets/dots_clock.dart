@@ -91,9 +91,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
     //
     // Is set to repeat as it should always be animating.
     _dotPulseController = AnimationController(
-      duration: Duration(
-        milliseconds: widget.style.idleAnimationDuration,
-      ),
+      duration: widget.style.idleAnimationDuration,
       vsync: this,
     );
     _dotPulseAnimation = Tween(begin: 0.0, end: 2 * pi).animate(
@@ -109,8 +107,7 @@ class DotsClockState extends State<DotsClock> with TickerProviderStateMixin {
     //
     // Plays for each clock update.
     _dotTransitionController = AnimationController(
-      duration:
-          Duration(milliseconds: widget.style.transitionAnimationDuration),
+      duration: widget.style.transitionAnimationDuration,
       vsync: this,
     );
     _dotTransitionAnimation =

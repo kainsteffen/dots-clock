@@ -23,8 +23,8 @@ class DotsClockStyle {
     this.darkColor: Colors.white,
     this.brightBackgroundColor: Colors.white,
     this.darkBackgroundColor: Colors.black,
-    this.idleAnimationDuration: 10000,
-    this.transitionAnimationDuration: 1000,
+    this.idleAnimationDuration: const Duration(milliseconds: 10000),
+    this.transitionAnimationDuration: const Duration(milliseconds: 3500),
     this.fontSize: 0.4,
     this.fontSpacing: 1.0,
     this.middleSpacing: 0.0,
@@ -52,9 +52,7 @@ class DotsClockStyle {
         assert(xOffset != null),
         assert(yOffset != null),
         assert(shouldCenterVertically != null),
-        assert(shouldCenterHorizontally != null),
-        assert(idleAnimationDuration > 0),
-        assert(transitionAnimationDuration > 0);
+        assert(shouldCenterHorizontally != null);
 
   /// Main color that constrasts with [brightBackgroundColor].
   ///
@@ -78,10 +76,10 @@ class DotsClockStyle {
 
   // TODO: Refactor this to [Duration] type.
   /// Duration of 1 cycle of the dots' idle animations.
-  final int idleAnimationDuration;
+  final Duration idleAnimationDuration;
 
   /// Duration of 1 cycle of the dots' transition animations.
-  final int transitionAnimationDuration;
+  final Duration transitionAnimationDuration;
 
   /// Space between each dot.
   ///
@@ -139,8 +137,8 @@ class DotsClockStyle {
     Color darkColor,
     Color brightBackgroundColor,
     Color darkBackgroundColor,
-    int idleAnimationDuration,
-    int transitionAnimationDuration,
+    Duration idleAnimationDuration,
+    Duration transitionAnimationDuration,
     double dotSpacing,
     double dotBaseSize,
     double dotActiveScale,
