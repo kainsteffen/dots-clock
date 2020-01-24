@@ -14,16 +14,16 @@ Dots Clock is a digital clock written in Flutter, Dart. It was developed for the
 
 # Clock Variations
 
-| Variation    | Screenshot                   | Motion Design                      |
-|--------------|------------------------------|------------------------------------|
-|Standard      |![](images/standard.jpg)      |[Youtube](https://flutter.dev/clock)|
-|Blobs         |![](images/blobs.jpg)         |[Youtube](https://flutter.dev/clock)|
-|Gooey         |![](images/gooey.jpg)         |[Youtube](https://flutter.dev/clock)|
-|Cellular Noise|![](images/cellular_noise.jpg)|[Youtube](https://flutter.dev/clock)|
-|Cubic Noise   |![](images/cubic_noise.jpg)   |[Youtube](https://flutter.dev/clock)|
-|Simplex Noise |![](images/simplex_noise.jpg) |[Youtube](https://flutter.dev/clock)|
-|Value Noise   |![](images/value_noise.jpg)   |[Youtube](https://flutter.dev/clock)|
-|White Noise   |![](images/white_noise.jpg)   |[Youtube](https://flutter.dev/clock)|
+| Variation    | Screenshot                   | Motion Design                         |
+|--------------|------------------------------|---------------------------------------|
+|Standard      |![](images/standard.jpg)      |[Youtube](https://youtu.be/Tpy14bsTklk)|
+|Blobs         |![](images/blobs.jpg)         |[Youtube](https://youtu.be/lfHU84U6yCs)|
+|Gooey         |![](images/gooey.jpg)         |[Youtube](https://youtu.be/QuXPebSS1Ko)|
+|Cellular Noise|![](images/cellular_noise.jpg)|[Youtube](https://youtu.be/BO_C2CW6tDc)|
+|Cubic Noise   |![](images/cubic_noise.jpg)   |[Youtube](https://youtu.be/V2TbrsmReXg)|
+|Simplex Noise |![](images/simplex_noise.jpg) |[Youtube](https://youtu.be/nMR9yyPnXDM)|
+|Value Noise   |![](images/value_noise.jpg)   |[Youtube](https://youtu.be/NWtwxKwSCDw)|
+|White Noise   |![](images/white_noise.jpg)   |[Youtube](https://youtu.be/Cx_ia3M_JdU)|
 
 
 # Design Philosophy
