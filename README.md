@@ -1,4 +1,4 @@
-![](images/standard.jpg)
+![](images/dots_clock_standard.gif)
 
 # Dots Clock
 
