@@ -75,9 +75,9 @@ class DotsPainter extends CustomPainter {
 
         // Paint dots differently based on their state:
         if (oldPath != null && currentPath != null) {
-          // Dot is at inactive -> active state (transition scale down animation)
+          // Dot is at active -> inactive state (transition scale down animation)
           if (oldPath.contains(offset) && !currentPath.contains(offset)) {
-            radius = radius * transitionValue.clamp(1, dotActiveScale);
+            radius = (radius * transitionValue.clamp(1, dotActiveScale)).abs();
           }
 
           // Dot is at inactive -> active state (transition scale up animation)
